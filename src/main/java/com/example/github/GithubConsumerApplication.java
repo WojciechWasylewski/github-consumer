@@ -28,13 +28,13 @@ public class GithubConsumerApplication {
     @EventListener(ApplicationStartedEvent.class)
     public void run() {
         try {
-            //Testowanie zapytań
-            List<GitHubResponse> response = githubProxy.getAllUserRepos("kalqa", " application/json");
-            System.out.println(response);
-            System.out.println();
-
-            List<GitHubBranchesResponse> response2 = githubProxy.getRepoInfo("kalqa", "03-open-feign");
-            System.out.println(response2);
+//            //Testowanie zapytań
+//            List<GitHubResponse> response = githubProxy.getAllUserRepos("kalqa", " application/json");
+//            System.out.println(response);
+//            System.out.println();
+//
+//            List<GitHubBranchesResponse> response2 = githubProxy.getRepoInfo("kalqa", "03-open-feign");
+//            System.out.println(response2);
 
         } catch (FeignException.FeignClientException exception) {
             System.out.println("client exception " + exception.status());
