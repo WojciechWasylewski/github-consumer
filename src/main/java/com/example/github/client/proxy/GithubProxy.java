@@ -1,5 +1,6 @@
 package com.example.github.client.proxy;
 
+import feign.Response;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,5 +24,8 @@ public interface GithubProxy {
     List<GitHubBranchesResponse> getRepoInfo(
             @PathVariable String owner,
             @PathVariable String repo);
+
+    @GetMapping("/users/{username}")
+    Response checkUserExists(@PathVariable String username);
 }
 
