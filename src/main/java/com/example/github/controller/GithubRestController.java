@@ -5,13 +5,12 @@ import com.example.github.client.proxy.GitHubResponse;
 import com.example.github.client.proxy.GithubProxy;
 import com.example.github.controller.dto.response.GetAllUserRepoInfoResponseDto;
 import com.example.github.controller.error.GithubUserNotFoundException;
+import com.example.github.controller.error.InvalidFormatResponseError;
 import feign.Response;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,8 +28,12 @@ public class GithubRestController {
         this.githubProxy = githubProxy;
     }
 
-    @GetMapping("/{username}")
-    public ResponseEntity<GetAllUserRepoInfoResponseDto> getAllRepositories(@PathVariable String username) {
+    @GetMapping(value = "/{username}")
+    public ResponseEntity<GetAllUserRepoInfoResponseDto> getAllRepositories(@PathVariable String username, @RequestHeader("Accept") String acceptHeader) {
+        if(acceptHeader.contains(MediaType.APPLICATION_XML_VALUE)){
+           throw new InvalidFormatResponseError("Requested media type 'application/xml' is not supported");
+        }
+
         if (!githubUserExists(username)) {
             throw new GithubUserNotFoundException("User with username: " + username + " not found");
         }
