@@ -1,12 +1,18 @@
-package com.example.github.controller;
+package com.example.github.infrastructure.controller;
 
 import com.example.github.client.proxy.GitHubBranchesResponse;
 import com.example.github.client.proxy.GitHubResponse;
 import com.example.github.client.proxy.GithubProxy;
-import com.example.github.controller.dto.response.GetAllUserRepoInfoResponseDto;
-import com.example.github.controller.error.GithubUserNotFoundException;
-import com.example.github.controller.error.InvalidFormatResponseError;
+import com.example.github.domain.model.RepoInfo;
+import com.example.github.domain.service.RepoAdder;
+import com.example.github.domain.service.RepoRetreiver;
+import com.example.github.infrastructure.controller.dto.response.*;
+import com.example.github.infrastructure.controller.error.GithubUserNotFoundException;
+import com.example.github.infrastructure.controller.error.InvalidFormatResponseError;
 import feign.Response;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +23,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.github.infrastructure.controller.RepoInfoMapper.*;
+
 @RestController
 @Log4j2
 @RequestMapping("/github.agent")
+@AllArgsConstructor
 public class GithubRestController {
 
     private final GithubProxy githubProxy;
+    private final RepoRetreiver repoRetreiver;
+    private final RepoAdder repoAdder;
 
-    public GithubRestController(GithubProxy githubProxy) {
-        this.githubProxy = githubProxy;
-    }
 
     @GetMapping(value = "/{username}")
     public ResponseEntity<GetAllUserRepoInfoResponseDto> getAllRepositories(@PathVariable String username, @RequestHeader("Accept") String acceptHeader) {
@@ -56,6 +64,28 @@ public class GithubRestController {
         GetAllUserRepoInfoResponseDto responseDto = new GetAllUserRepoInfoResponseDto(repositoryInfoList);
 
         return ResponseEntity.ok(responseDto);
+    }
+
+    @GetMapping("/repos")
+   public ResponseEntity<GetAllReposResponseDto> getAllRepos(){
+        List<RepoInfo> allRepos = repoRetreiver.findAll();
+        GetAllReposResponseDto response = mapFromRepoInfoToGetAllReposResponseDto(allRepos);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/repos/{id}")
+    public ResponseEntity<GetRepoResponseDto> getRepoById(@PathVariable Long id){
+        RepoInfo repoInfo = repoRetreiver.findById(id);
+        GetRepoResponseDto response = mapFromRepoInfoToGetRepoInfoResponseDto(repoInfo);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/repos")
+    public ResponseEntity<CreateRepoResponseDto> postRepo(@RequestBody @Valid CreateRepoRequestDto request) {
+        RepoInfo repoInfo = RepoInfoMapper.mapFromCreateRepoRequestDtoToRepoInfo(request);
+        RepoInfo savedRepo = repoAdder.addRepo(repoInfo);
+        CreateRepoResponseDto body = mapFromRepoInfoToCreateRepoResponseDto(savedRepo);
+        return ResponseEntity.ok(body);
     }
 
     public boolean githubUserExists(String username) {

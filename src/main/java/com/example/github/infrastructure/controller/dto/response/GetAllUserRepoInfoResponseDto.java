@@ -1,6 +1,4 @@
-package com.example.github.controller.dto.response;
-
-import com.example.github.controller.RepositoryInfoDTO;
+package com.example.github.infrastructure.controller.dto.response;
 
 import java.util.List;
 

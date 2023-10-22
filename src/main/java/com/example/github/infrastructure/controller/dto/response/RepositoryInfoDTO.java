@@ -1,4 +1,4 @@
-package com.example.github.controller;
+package com.example.github.infrastructure.controller.dto.response;
 
 import java.util.Map;
 

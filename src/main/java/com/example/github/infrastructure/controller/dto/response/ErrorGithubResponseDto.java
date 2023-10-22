@@ -1,4 +1,4 @@
-package com.example.github.controller.dto.response;
+package com.example.github.infrastructure.controller.dto.response;
 
 import org.springframework.http.HttpStatus;
 

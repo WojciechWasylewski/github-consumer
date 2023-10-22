@@ -1,4 +1,4 @@
-package com.example.github.controller.error;
+package com.example.github.infrastructure.controller.error;
 
 public class InvalidFormatResponseError extends RuntimeException {
     public InvalidFormatResponseError(String message) {
