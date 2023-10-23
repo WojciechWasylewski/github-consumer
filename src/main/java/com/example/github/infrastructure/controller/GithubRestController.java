@@ -5,7 +5,9 @@ import com.example.github.client.proxy.GitHubResponse;
 import com.example.github.client.proxy.GithubProxy;
 import com.example.github.domain.model.RepoInfo;
 import com.example.github.domain.service.RepoAdder;
+import com.example.github.domain.service.RepoDeleter;
 import com.example.github.domain.service.RepoRetreiver;
+import com.example.github.infrastructure.controller.dto.request.CreateRepoRequestDto;
 import com.example.github.infrastructure.controller.dto.response.*;
 import com.example.github.infrastructure.controller.error.GithubUserNotFoundException;
 import com.example.github.infrastructure.controller.error.InvalidFormatResponseError;
@@ -34,6 +36,7 @@ public class GithubRestController {
     private final GithubProxy githubProxy;
     private final RepoRetreiver repoRetreiver;
     private final RepoAdder repoAdder;
+    private final RepoDeleter repoDeleter;
 
 
     @GetMapping(value = "/{username}")
@@ -85,6 +88,13 @@ public class GithubRestController {
         RepoInfo repoInfo = RepoInfoMapper.mapFromCreateRepoRequestDtoToRepoInfo(request);
         RepoInfo savedRepo = repoAdder.addRepo(repoInfo);
         CreateRepoResponseDto body = mapFromRepoInfoToCreateRepoResponseDto(savedRepo);
+        return ResponseEntity.ok(body);
+    }
+
+    @DeleteMapping("/repos/{id}")
+    public ResponseEntity<DeleteRepoInfoDto> deleteRepoById(@PathVariable Long id){
+        repoDeleter.deleteById(id);
+        DeleteRepoInfoDto body = mapFromRepoInfoToDeleteRepoInfoDto(id);
         return ResponseEntity.ok(body);
     }
 

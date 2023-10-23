@@ -1,4 +1,4 @@
-package com.example.github.infrastructure.controller;
+package com.example.github.infrastructure.controller.dto.request;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

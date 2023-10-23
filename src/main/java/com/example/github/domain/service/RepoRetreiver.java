@@ -26,4 +26,10 @@ public class RepoRetreiver {
                 .orElseThrow(() -> new GitHubRepoNotFoundException("Github repository with id: " + id + " not found"));
     }
 
+    public void existsById(Long id) {
+        if (!githubRepository.existsById(id)) {
+            throw new GitHubRepoNotFoundException("Repo with id: " + id + " not found");
+        }
+    }
+
 }
