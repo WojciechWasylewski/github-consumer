@@ -3,11 +3,13 @@ package com.example.github.infrastructure.controller;
 import com.example.github.client.proxy.GitHubBranchesResponse;
 import com.example.github.client.proxy.GitHubResponse;
 import com.example.github.client.proxy.GithubProxy;
-import com.example.github.domain.model.RepoInfo;
+import com.example.github.domain.model.Repo;
 import com.example.github.domain.service.RepoAdder;
 import com.example.github.domain.service.RepoDeleter;
 import com.example.github.domain.service.RepoRetreiver;
+import com.example.github.domain.service.RepoUpdater;
 import com.example.github.infrastructure.controller.dto.request.CreateRepoRequestDto;
+import com.example.github.infrastructure.controller.dto.request.UpdateRepoRequestDto;
 import com.example.github.infrastructure.controller.dto.response.*;
 import com.example.github.infrastructure.controller.error.GithubUserNotFoundException;
 import com.example.github.infrastructure.controller.error.InvalidFormatResponseError;
@@ -16,6 +18,8 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +41,7 @@ public class GithubRestController {
     private final RepoRetreiver repoRetreiver;
     private final RepoAdder repoAdder;
     private final RepoDeleter repoDeleter;
+    private final RepoUpdater repoUpdater;
 
 
     @GetMapping(value = "/{username}")
@@ -70,23 +75,23 @@ public class GithubRestController {
     }
 
     @GetMapping("/repos")
-   public ResponseEntity<GetAllReposResponseDto> getAllRepos(){
-        List<RepoInfo> allRepos = repoRetreiver.findAll();
+   public ResponseEntity<GetAllReposResponseDto> getAllRepos(@PageableDefault(page = 0, size = 10) Pageable pageable){
+        List<Repo> allRepos = repoRetreiver.findAll(pageable);
         GetAllReposResponseDto response = mapFromRepoInfoToGetAllReposResponseDto(allRepos);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/repos/{id}")
     public ResponseEntity<GetRepoResponseDto> getRepoById(@PathVariable Long id){
-        RepoInfo repoInfo = repoRetreiver.findById(id);
-        GetRepoResponseDto response = mapFromRepoInfoToGetRepoInfoResponseDto(repoInfo);
+        Repo repo = repoRetreiver.findById(id);
+        GetRepoResponseDto response = mapFromRepoInfoToGetRepoInfoResponseDto(repo);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/repos")
     public ResponseEntity<CreateRepoResponseDto> postRepo(@RequestBody @Valid CreateRepoRequestDto request) {
-        RepoInfo repoInfo = RepoInfoMapper.mapFromCreateRepoRequestDtoToRepoInfo(request);
-        RepoInfo savedRepo = repoAdder.addRepo(repoInfo);
+        Repo repo = RepoInfoMapper.mapFromCreateRepoRequestDtoToRepoInfo(request);
+        Repo savedRepo = repoAdder.addRepo(repo);
         CreateRepoResponseDto body = mapFromRepoInfoToCreateRepoResponseDto(savedRepo);
         return ResponseEntity.ok(body);
     }
@@ -95,6 +100,14 @@ public class GithubRestController {
     public ResponseEntity<DeleteRepoInfoDto> deleteRepoById(@PathVariable Long id){
         repoDeleter.deleteById(id);
         DeleteRepoInfoDto body = mapFromRepoInfoToDeleteRepoInfoDto(id);
+        return ResponseEntity.ok(body);
+    }
+
+    @PutMapping("/repos/{id}")
+    public ResponseEntity<UpdateRepoResponseDto> updateRepo(@PathVariable Long id, @RequestBody @Valid UpdateRepoRequestDto request){
+        Repo newRepo = mapFromUpdateRepoInfoRequestDtoToRepo(request);
+        repoUpdater.updateById(id,newRepo);
+        UpdateRepoResponseDto body = mapFromRepoInfoToUpdateRepoResponseDto(newRepo);
         return ResponseEntity.ok(body);
     }
 

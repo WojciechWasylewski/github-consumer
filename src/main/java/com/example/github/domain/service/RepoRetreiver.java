@@ -1,9 +1,10 @@
 package com.example.github.domain.service;
 
-import com.example.github.domain.model.RepoInfo;
+import com.example.github.domain.model.Repo;
 import com.example.github.domain.repository.GithubRepository;
 import com.example.github.infrastructure.controller.error.GitHubRepoNotFoundException;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,11 +18,11 @@ public class RepoRetreiver {
         this.githubRepository = githubRepository;
     }
 
-    public List<RepoInfo> findAll(){
-        return githubRepository.findAll();
+    public List<Repo> findAll(Pageable pageable){
+        return githubRepository.findAll(pageable);
     }
 
-    public RepoInfo findById(Long id){
+    public Repo findById(Long id){
         return githubRepository.findById(id)
                 .orElseThrow(() -> new GitHubRepoNotFoundException("Github repository with id: " + id + " not found"));
     }

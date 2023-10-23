@@ -8,7 +8,7 @@ import lombok.*;
 @Getter
 @Setter
 @Table(name = "repo")
-public class RepoInfo {
+public class Repo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,15 +18,15 @@ public class RepoInfo {
     @Column(nullable = false)
     String name;
 
-    public RepoInfo() {
+    public Repo() {
 
     }
-    public RepoInfo(String owner, String name) {
+    public Repo(String owner, String name) {
         this.owner = owner;
         this.name = name;
     }
 
-    public RepoInfo(Long id, String owner, String name) {
+    public Repo(Long id, String owner, String name) {
         this.id = id;
         this.owner = owner;
         this.name = name;
