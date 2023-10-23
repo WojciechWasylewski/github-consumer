@@ -14,7 +14,6 @@ import com.example.github.infrastructure.controller.dto.response.*;
 import com.example.github.infrastructure.controller.error.GithubUserNotFoundException;
 import com.example.github.infrastructure.controller.error.InvalidFormatResponseError;
 import feign.Response;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -88,9 +87,9 @@ public class GithubRestController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/repos")
+    @PostMapping(value = "/repos", consumes = "application/json")
     public ResponseEntity<CreateRepoResponseDto> postRepo(@RequestBody @Valid CreateRepoRequestDto request) {
-        Repo repo = RepoInfoMapper.mapFromCreateRepoRequestDtoToRepoInfo(request);
+        Repo repo = RepoInfoMapper.mapFromCreateRepoRequestDtoToRepo(request);
         Repo savedRepo = repoAdder.addRepo(repo);
         CreateRepoResponseDto body = mapFromRepoInfoToCreateRepoResponseDto(savedRepo);
         return ResponseEntity.ok(body);

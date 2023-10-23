@@ -13,7 +13,7 @@ public class RepoInfoMapper {
         return new RepoDto(repo.getId(), repo.getOwner(), repo.getName());
     }
 
-    public static Repo mapFromCreateRepoRequestDtoToRepoInfo(CreateRepoRequestDto request) {
+    public static Repo mapFromCreateRepoRequestDtoToRepo(CreateRepoRequestDto request) {
         return new Repo(request.owner(), request.name());
     }
 
