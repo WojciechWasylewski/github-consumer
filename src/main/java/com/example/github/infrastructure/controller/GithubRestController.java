@@ -45,8 +45,8 @@ public class GithubRestController {
 
     @GetMapping(value = "/{username}")
     public ResponseEntity<GetAllUserRepoInfoResponseDto> getAllRepositories(@PathVariable String username, @RequestHeader("Accept") String acceptHeader) {
-        if(acceptHeader.contains(MediaType.APPLICATION_XML_VALUE)){
-           throw new InvalidFormatResponseError("Requested media type 'application/xml' is not supported");
+        if (acceptHeader.contains(MediaType.APPLICATION_XML_VALUE)) {
+            throw new InvalidFormatResponseError("Requested media type 'application/xml' is not supported");
         }
 
         if (!githubUserExists(username)) {
@@ -68,20 +68,30 @@ public class GithubRestController {
             repositoryInfoList.add(repositoryInfo);
         }
 
+        List<Repo> allUsersRepo = new ArrayList<>();
+        for (GitHubResponse repository : repositories) {
+            Repo repo = new Repo();
+            repo.setName(repository.name());
+            repo.setOwner(repository.owner().login());
+            allUsersRepo.add(repo);
+        }
+        repoAdder.addAllRepos(allUsersRepo);
+
+
         GetAllUserRepoInfoResponseDto responseDto = new GetAllUserRepoInfoResponseDto(repositoryInfoList);
 
         return ResponseEntity.ok(responseDto);
     }
 
     @GetMapping("/repos")
-   public ResponseEntity<GetAllReposResponseDto> getAllRepos(@PageableDefault(page = 0, size = 10) Pageable pageable){
+    public ResponseEntity<GetAllReposResponseDto> getAllRepos(@PageableDefault(page = 0, size = 10) Pageable pageable) {
         List<Repo> allRepos = repoRetreiver.findAll(pageable);
         GetAllReposResponseDto response = mapFromRepoInfoToGetAllReposResponseDto(allRepos);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/repos/{id}")
-    public ResponseEntity<GetRepoResponseDto> getRepoById(@PathVariable Long id){
+    public ResponseEntity<GetRepoResponseDto> getRepoById(@PathVariable Long id) {
         Repo repo = repoRetreiver.findById(id);
         GetRepoResponseDto response = mapFromRepoInfoToGetRepoInfoResponseDto(repo);
         return ResponseEntity.ok(response);
@@ -96,16 +106,16 @@ public class GithubRestController {
     }
 
     @DeleteMapping("/repos/{id}")
-    public ResponseEntity<DeleteRepoInfoDto> deleteRepoById(@PathVariable Long id){
+    public ResponseEntity<DeleteRepoInfoDto> deleteRepoById(@PathVariable Long id) {
         repoDeleter.deleteById(id);
         DeleteRepoInfoDto body = mapFromRepoInfoToDeleteRepoInfoDto(id);
         return ResponseEntity.ok(body);
     }
 
     @PutMapping("/repos/{id}")
-    public ResponseEntity<UpdateRepoResponseDto> updateRepo(@PathVariable Long id, @RequestBody @Valid UpdateRepoRequestDto request){
+    public ResponseEntity<UpdateRepoResponseDto> updateRepo(@PathVariable Long id, @RequestBody @Valid UpdateRepoRequestDto request) {
         Repo newRepo = mapFromUpdateRepoInfoRequestDtoToRepo(request);
-        repoUpdater.updateById(id,newRepo);
+        repoUpdater.updateById(id, newRepo);
         UpdateRepoResponseDto body = mapFromRepoInfoToUpdateRepoResponseDto(newRepo);
         return ResponseEntity.ok(body);
     }

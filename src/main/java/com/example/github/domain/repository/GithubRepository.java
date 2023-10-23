@@ -18,6 +18,8 @@ public interface GithubRepository extends Repository<Repo, Long> {
 
     Repo save(Repo repo);
 
+    List<Repo> saveAll(Iterable<Repo> repos);
+
     @Modifying
     @Query("DELETE Repo r WHERE r.id = :id")
     void deleteById(Long id);
